@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% block title %}{{ 'New Waste' if active_module == 'new-waste' else 'Citizen Dashboard' }} | EcoCycle{% endblock %}
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-emerald-50 via-green-50 to-emerald-100 lg:flex">
+    <aside class="flex w-full flex-col border-b border-emerald-900/10 bg-slate-950 text-white lg:fixed lg:inset-y-0 lg:w-64 lg:border-b-0 lg:border-r lg:border-white/10">
+        <a href="{{ url_for('citizen_dashboard') }}" class="flex items-center gap-3 px-5 py-5">
+            <span class="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-500 shadow-lg shadow-emerald-500/20"><i data-lucide="recycle" class="h-6 w-6"></i></span>
+            <span><span class="brand-font block text-lg font-extrabold">EcoCycle</span><span class="block text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-300">Citizen portal</span></span>
+        </a>
+        <div class="hidden px-5 pb-3 pt-7 text-[10px] font-extrabold uppercase tracking-[0.2em] text-slate-500 lg:block">Workspace</div>
+        <nav class="flex gap-2 overflow-x-auto px-4 pb-4 lg:flex-col lg:overflow-visible">
+            <a href="{{ url_for('citizen_dashboard') }}" class="flex shrink-0 items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition {% if active_module == 'dashboard' %}bg-emerald-500 text-white shadow-lg shadow-emerald-900/20{% else %}text-slate-300 hover:bg-white/10 hover:text-white{% endif %}">
+                <i data-lucide="layout-dashboard" class="h-4 w-4"></i> Dashboard
+            </a>
+            <a href="{{ url_for('citizen_new_waste') }}" class="flex shrink-0 items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition {% if active_module == 'new-waste' %}bg-emerald-500 text-white shadow-lg shadow-emerald-900/20{% else %}text-slate-300 hover:bg-white/10 hover:text-white{% endif %}">
+                <i data-lucide="plus-square" class="h-4 w-4"></i> New Waste
+            </a>
+        </nav>
+        <div class="mt-auto hidden border-t border-white/10 p-4 lg:block">
+            <div class="mb-4 flex items-center gap-3 rounded-xl bg-white/5 p-3">
+                <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500/15 text-emerald-300"><i data-lucide="user-round" class="h-4 w-4"></i></span>
+                <span class="min-w-0"><span class="block truncate text-xs font-bold">{{ citizen_name }}</span><span class="text-[10px] text-slate-400">Citizen account</span></span>
+            </div>
+            <a href="{{ url_for('logout') }}" class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-slate-300 transition hover:bg-rose-500/10 hover:text-rose-300"><i data-lucide="log-out" class="h-4 w-4"></i> Sign out</a>
+        </div>
+    </aside>
+
+    <div class="min-w-0 flex-1 lg:ml-64">
+        <header class="sticky top-0 z-20 flex items-center justify-between border-b border-white/70 bg-white/80 px-5 py-4 backdrop-blur-xl sm:px-8">
+            <div><p class="text-xs font-bold uppercase tracking-widest text-emerald-700">Citizen workspace</p><h1 class="brand-font mt-0.5 text-lg font-extrabold text-slate-900">{% if active_module == 'new-waste' %}Register new waste{% else %}Dashboard overview{% endif %}</h1></div>
+            <div class="flex items-center gap-3">
+                <span class="hidden text-sm font-semibold text-slate-600 sm:block">{{ citizen_name }}</span>
+                <a href="{{ url_for('logout') }}" class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-600 transition hover:border-rose-200 hover:text-rose-700 lg:hidden"><i data-lucide="log-out" class="inline h-4 w-4"></i></a>
+            </div>
+        </header>
+
+        <main class="mx-auto max-w-7xl space-y-7 p-5 sm:p-8">
+            {% if active_module == 'dashboard' %}
+            <section class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-700 via-emerald-600 to-teal-600 p-7 text-white shadow-xl shadow-emerald-800/15 sm:p-9">
+                <div class="relative z-10 max-w-2xl">
+                    <p class="mb-2 text-xs font-extrabold uppercase tracking-[0.2em] text-emerald-100">Your circular impact</p>
+                    <h2 class="brand-font text-3xl font-extrabold tracking-tight sm:text-4xl">Welcome back, {{ citizen_name.split()[0] }}!</h2>
+                    <p class="mt-3 text-sm leading-6 text-emerald-50/90">Every device you recycle helps recover valuable materials and keeps harmful waste out of landfills.</p>
+                    <a href="{{ url_for('citizen_new_waste') }}" class="mt-5 inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-extrabold text-emerald-800 shadow-lg transition hover:-translate-y-0.5"><i data-lucide="plus" class="h-4 w-4"></i> Add e-waste</a>
+                </div>
+                <i data-lucide="leaf" class="absolute -bottom-12 -right-5 h-52 w-52 text-white/10"></i>
+            </section>
+
+            <section class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                <article class="rounded-2xl border border-white bg-white/90 p-5 shadow-lg shadow-emerald-950/5">
+                    <div class="flex items-center justify-between"><p class="text-sm font-bold text-slate-500">My Total Waste Count</p><span class="rounded-xl bg-emerald-50 p-2.5 text-emerald-700"><i data-lucide="package-check" class="h-5 w-5"></i></span></div>
+                    <p class="mt-5 text-3xl font-extrabold text-slate-900">{{ stats.item_count }}</p><p class="mt-1 text-xs text-slate-500">Items registered</p>
+                </article>
+                <article class="rounded-2xl border border-white bg-white/90 p-5 shadow-lg shadow-emerald-950/5">
+                    <div class="flex items-center justify-between"><p class="text-sm font-bold text-slate-500">Total Weight</p><span class="rounded-xl bg-teal-50 p-2.5 text-teal-700"><i data-lucide="weight" class="h-5 w-5"></i></span></div>
+                    <p class="mt-5 text-3xl font-extrabold text-slate-900">{{ "%.2f"|format(stats.total_weight) }} <span class="text-base">kg</span></p><p class="mt-1 text-xs text-slate-500">Across your registered items</p>
+                </article>
+                <article class="rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-600 p-5 text-white shadow-lg shadow-emerald-800/15">
+                    <div class="flex items-center justify-between"><p class="text-sm font-bold text-emerald-50">Total Eco Rewards</p><span class="rounded-xl bg-white/15 p-2.5"><i data-lucide="badge-dollar-sign" class="h-5 w-5"></i></span></div>
+                    <p class="mt-5 text-3xl font-extrabold">${{ "%.2f"|format(rewards) }}</p><p class="mt-1 text-xs text-emerald-50">Earned from completed collections</p>
+                </article>
+            </section>
+
+            <section class="overflow-hidden rounded-2xl border border-white bg-white/95 shadow-lg shadow-emerald-950/5">
+                <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 px-5 py-5 sm:px-6">
+                    <div><h2 class="brand-font text-lg font-extrabold text-slate-900">My Recent Items</h2><p class="mt-1 text-sm text-slate-500">See your submissions and collection progress.</p></div>
+                    <a href="{{ url_for('citizen_new_waste') }}" class="rounded-xl bg-emerald-600 px-4 py-2.5 text-xs font-extrabold text-white transition hover:bg-emerald-700">Register item</a>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full min-w-[640px] text-left text-sm">
+                        <thead class="bg-emerald-50/70 text-[10px] font-extrabold uppercase tracking-widest text-slate-500"><tr><th class="px-5 py-3">Item</th><th class="px-5 py-3">Weight</th><th class="px-5 py-3">Submitted</th><th class="px-5 py-3">Status</th></tr></thead>
+                        <tbody class="divide-y divide-slate-100">
+                            {% for item in items %}
+                            <tr class="transition hover:bg-emerald-50/30">
+                                <td class="px-5 py-4"><div class="flex items-center gap-3">{% if item.image_path %}<img src="{{ url_for('static', filename=item.image_path) }}" alt="" class="h-10 w-10 rounded-xl object-cover">{% else %}<span class="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700"><i data-lucide="cpu" class="h-5 w-5"></i></span>{% endif %}<span><span class="block font-bold text-slate-900">{{ item.item_type }}</span><span class="line-clamp-1 block max-w-xs text-xs text-slate-500">{{ item.description or 'No description' }}</span></span></div></td>
+                                <td class="whitespace-nowrap px-5 py-4 font-bold text-slate-700">{{ "%.2f"|format(item.weight) }} kg</td>
+                                <td class="whitespace-nowrap px-5 py-4 text-slate-500">{{ item.created_at[:10] }}</td>
+                                <td class="px-5 py-4"><span class="rounded-full px-2.5 py-1 text-[10px] font-extrabold {% if item.status == 'completed' %}bg-emerald-100 text-emerald-800{% else %}bg-amber-100 text-amber-800{% endif %}">{{ item.status|capitalize }}</span></td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="4" class="px-5 py-12 text-center"><span class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-700"><i data-lucide="package-open" class="h-6 w-6"></i></span><p class="mt-3 font-bold text-slate-700">No items yet</p><p class="mt-1 text-sm text-slate-500">Register your first device to get started.</p></td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            {% else %}
+            <section class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
+                <article class="rounded-2xl border border-white bg-white/95 p-6 shadow-lg shadow-emerald-950/5 sm:p-8">
+                    <div class="mb-7 flex items-start gap-4"><span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700"><i data-lucide="recycle" class="h-6 w-6"></i></span><div><h2 class="brand-font text-xl font-extrabold text-slate-900">Tell us what you’re recycling</h2><p class="mt-1 text-sm text-slate-500">Add the item details and where our collection team can pick it up.</p></div></div>
+                    <form method="post" action="{{ url_for('citizen_new_waste') }}" enctype="multipart/form-data" class="space-y-5">
+                        <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                            <div><label for="item-type" class="mb-1.5 block text-xs font-extrabold uppercase tracking-wide text-slate-600">Item Type</label><select id="item-type" name="item_type" required class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/10"><option value="">Select a category</option><option>Laptop</option><option>Mobile phone</option><option>Battery</option><option>Tablet</option><option>Monitor</option><option>Television</option><option>Printer</option><option>Small appliance</option><option>Other electronics</option></select></div>
+                            <div><label for="weight" class="mb-1.5 block text-xs font-extrabold uppercase tracking-wide text-slate-600">Weight (kg)</label><input id="weight" name="weight" type="number" step="0.01" min="0.01" max="10000" required placeholder="e.g. 2.50" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/10"></div>
+                        </div>
+                        <div><label for="description" class="mb-1.5 block text-xs font-extrabold uppercase tracking-wide text-slate-600">Description</label><textarea id="description" name="description" rows="3" maxlength="1000" placeholder="Add the model, condition, or any handling details..." class="w-full resize-y rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/10"></textarea></div>
+                        <div><label for="image" class="mb-1.5 block text-xs font-extrabold uppercase tracking-wide text-slate-600">Item Image <span class="font-medium normal-case tracking-normal text-slate-400">(optional, JPG/PNG/WEBP up to 8 MB)</span></label><label for="image" class="flex cursor-pointer items-center gap-4 rounded-xl border border-dashed border-emerald-300 bg-emerald-50/50 p-4 transition hover:bg-emerald-50"><span class="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-emerald-700 shadow-sm"><i data-lucide="image-plus" class="h-5 w-5"></i></span><span><span class="block text-sm font-bold text-slate-700" id="image-label">Choose an item photo</span><span class="mt-0.5 block text-xs text-slate-500">A clear photo helps our team identify your device.</span></span><input id="image" name="image" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" class="sr-only"></label></div>
+                        <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                            <div><label for="pickup-date" class="mb-1.5 block text-xs font-extrabold uppercase tracking-wide text-slate-600">Pickup Date</label><input id="pickup-date" name="pickup_date" type="date" min="{{ today }}" value="{{ today }}" required class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/10"></div>
+                            <div><label for="pickup-address" class="mb-1.5 block text-xs font-extrabold uppercase tracking-wide text-slate-600">Pickup Address</label><input id="pickup-address" name="pickup_address" type="text" maxlength="500" required placeholder="Street address, city, postal code" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/10"></div>
+                        </div>
+                        <div class="flex flex-col-reverse justify-between gap-3 border-t border-slate-100 pt-5 sm:flex-row sm:items-center"><p class="text-xs leading-5 text-slate-500"><i data-lucide="shield-check" class="mr-1 inline h-4 w-4 text-emerald-600"></i>Your pickup details are shared only with EcoCycle staff.</p><button type="submit" class="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-5 py-3 text-sm font-extrabold text-white shadow-lg shadow-emerald-700/20 transition hover:-translate-y-0.5"><i data-lucide="send" class="h-4 w-4"></i> Submit new entry</button></div>
+                    </form>
+                </article>
+                <aside class="space-y-5">
+                    <article class="rounded-2xl bg-gradient-to-br from-emerald-700 to-teal-700 p-6 text-white shadow-lg shadow-emerald-900/10"><span class="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-white/15"><i data-lucide="sparkles" class="h-5 w-5"></i></span><h3 class="brand-font text-lg font-extrabold">Good for the planet</h3><p class="mt-2 text-sm leading-6 text-emerald-50/90">Your device may contain materials that can be recovered and used again. Every responsible handoff matters.</p></article>
+                    <article class="rounded-2xl border border-white bg-white/90 p-5 shadow-lg shadow-emerald-950/5"><h3 class="font-extrabold text-slate-900">What happens next?</h3><div class="mt-4 space-y-4"><div class="flex gap-3"><span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-xs font-extrabold text-emerald-800">1</span><p class="text-xs leading-5 text-slate-600">Staff reviews the pickup request and details.</p></div><div class="flex gap-3"><span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-xs font-extrabold text-emerald-800">2</span><p class="text-xs leading-5 text-slate-600">The collection is arranged for your selected date.</p></div><div class="flex gap-3"><span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-xs font-extrabold text-emerald-800">3</span><p class="text-xs leading-5 text-slate-600">Rewards are credited after the collection is completed.</p></div></div></article>
+                </aside>
+            </section>
+            {% endif %}
+            <footer class="pb-2 text-center text-xs text-slate-500">EcoCycle · Small actions, lasting impact.</footer>
+        </main>
+    </div>
+</div>
+<script>
+    const imageInput = document.getElementById("image");
+    if (imageInput) imageInput.addEventListener("change", () => {
+        document.getElementById("image-label").textContent =
+            imageInput.files.length ? imageInput.files[0].name : "Choose an item photo";
+    });
+</script>
+{% endblock %}

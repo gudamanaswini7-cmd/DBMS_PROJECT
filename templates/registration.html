@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Create account | EcoCycle{% endblock %}
+{% block content %}
+<main class="safe-center relative flex min-h-screen justify-center overflow-hidden px-4 py-10">
+    <div class="pointer-events-none absolute -left-32 top-12 h-80 w-80 rounded-full bg-emerald-300/30 blur-3xl"></div>
+    <div class="pointer-events-none absolute -bottom-36 -right-20 h-96 w-96 rounded-full bg-teal-300/30 blur-3xl"></div>
+    <div class="relative my-auto w-full max-w-md">
+        <div class="mb-7 text-center">
+            <span class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-500 text-white shadow-xl shadow-emerald-700/20"><i data-lucide="leaf" class="h-8 w-8"></i></span>
+            <p class="mb-2 text-xs font-extrabold uppercase tracking-[0.22em] text-emerald-700">Join the circular movement</p>
+            <h1 class="brand-font text-3xl font-extrabold tracking-tight text-slate-900">Create your account</h1>
+            <p class="mt-2 text-sm text-slate-500">Start making a difference with responsible recycling.</p>
+        </div>
+        <section class="rounded-3xl border border-white/80 bg-white/85 p-7 shadow-2xl shadow-emerald-900/10 backdrop-blur-xl sm:p-8">
+            <form method="post" action="{{ url_for('register') }}" class="space-y-4">
+                <div>
+                    <label for="name" class="mb-1.5 block text-xs font-bold uppercase tracking-wide text-slate-600">Full name</label>
+                    <input id="name" name="name" type="text" autocomplete="name" maxlength="120" required placeholder="Your name" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/10">
+                </div>
+                <div>
+                    <label for="email" class="mb-1.5 block text-xs font-bold uppercase tracking-wide text-slate-600">Email address</label>
+                    <input id="email" name="email" type="email" autocomplete="email" maxlength="254" required placeholder="you@example.com" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/10">
+                </div>
+                <div>
+                    <label for="password" class="mb-1.5 block text-xs font-bold uppercase tracking-wide text-slate-600">Password</label>
+                    <input id="password" name="password" type="password" autocomplete="new-password" required placeholder="Create a password" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/10">
+                </div>
+                <div>
+                    <label for="confirm-password" class="mb-1.5 block text-xs font-bold uppercase tracking-wide text-slate-600">Confirm password</label>
+                    <input id="confirm-password" name="confirm_password" type="password" autocomplete="new-password" required placeholder="Enter your password again" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/10">
+                </div>
+                <div>
+                    <label for="category" class="mb-1.5 block text-xs font-bold uppercase tracking-wide text-slate-600">Category</label>
+                    <select id="category" name="category" required class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/10">
+                        <option value="citizen">Citizen</option>
+                        <option value="staff">Staff</option>
+                    </select>
+                </div>
+                <button type="submit" class="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-4 py-3.5 text-sm font-bold text-white shadow-lg shadow-emerald-700/20 transition hover:-translate-y-0.5 hover:shadow-xl">
+                    Create account <i data-lucide="arrow-up-right" class="h-4 w-4"></i>
+                </button>
+            </form>
+            <p class="mt-6 text-center text-sm text-slate-500">Already have an account? <a href="{{ url_for('login') }}" class="font-bold text-emerald-700 hover:text-emerald-900">Sign in</a></p>
+        </section>
+    </div>
+</main>
+{% endblock %}

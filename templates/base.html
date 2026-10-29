@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#ecfdf5">
+    <title>{% block title %}EcoCycle | E-Waste Management{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { font-family: "DM Sans", sans-serif; }
+        h1, h2, h3, .brand-font { font-family: "Manrope", sans-serif; }
+        .safe-center { align-items: safe center; }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-emerald-50 via-green-50 to-emerald-100 text-slate-800 antialiased">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="fixed right-4 top-4 z-50 flex w-[min(24rem,calc(100vw-2rem))] flex-col gap-2">
+                {% for category, message in messages %}
+                    <div class="flex items-center justify-between gap-3 rounded-2xl border px-4 py-3 text-sm font-semibold shadow-xl {% if category == 'success' %}border-emerald-200 bg-white text-emerald-800{% elif category == 'info' %}border-sky-200 bg-white text-sky-800{% elif category == 'warning' %}border-amber-200 bg-white text-amber-800{% else %}border-rose-200 bg-white text-rose-800{% endif %}">
+                        <span>{{ message }}</span>
+                        <button type="button" aria-label="Dismiss notification" onclick="this.parentElement.remove()" class="rounded-lg px-2 py-1 text-lg leading-none opacity-60 hover:bg-slate-100 hover:opacity-100">&times;</button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+    <script>if (window.lucide) lucide.createIcons();</script>
+</body>
+</html>

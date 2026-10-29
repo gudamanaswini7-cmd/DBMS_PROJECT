@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Sign in | EcoCycle{% endblock %}
+{% block content %}
+<main class="safe-center relative flex min-h-screen justify-center overflow-hidden px-4 py-10">
+    <div class="pointer-events-none absolute -left-32 top-12 h-80 w-80 rounded-full bg-emerald-300/30 blur-3xl"></div>
+    <div class="pointer-events-none absolute -bottom-36 -right-20 h-96 w-96 rounded-full bg-teal-300/30 blur-3xl"></div>
+    <div class="relative my-auto w-full max-w-md">
+        <div class="mb-7 text-center">
+            <span class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-500 text-white shadow-xl shadow-emerald-700/20"><i data-lucide="recycle" class="h-8 w-8"></i></span>
+            <p class="mb-2 text-xs font-extrabold uppercase tracking-[0.22em] text-emerald-700">A cleaner tomorrow</p>
+            <h1 class="brand-font text-3xl font-extrabold tracking-tight text-slate-900">Welcome to EcoCycle</h1>
+            <p class="mt-2 text-sm text-slate-500">A smarter way to recover and recycle electronics.</p>
+        </div>
+        <section class="rounded-3xl border border-white/80 bg-white/85 p-7 shadow-2xl shadow-emerald-900/10 backdrop-blur-xl sm:p-8">
+            <div class="mb-6">
+                <h2 class="text-xl font-extrabold text-slate-900">Sign in to your account</h2>
+                <p class="mt-1 text-sm text-slate-500">Choose the category associated with your account.</p>
+            </div>
+            <form method="post" action="{{ url_for('login') }}" class="space-y-4">
+                <div>
+                    <label for="email" class="mb-1.5 block text-xs font-bold uppercase tracking-wide text-slate-600">Email address</label>
+                    <input id="email" name="email" type="email" autocomplete="email" required placeholder="you@example.com" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/10">
+                </div>
+                <div>
+                    <label for="password" class="mb-1.5 block text-xs font-bold uppercase tracking-wide text-slate-600">Password</label>
+                    <input id="password" name="password" type="password" autocomplete="current-password" required placeholder="Enter your password" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/10">
+                </div>
+                <div>
+                    <label for="category" class="mb-1.5 block text-xs font-bold uppercase tracking-wide text-slate-600">Account category</label>
+                    <select id="category" name="category" required class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/10">
+                        <option value="citizen">Citizen</option>
+                        <option value="staff">Staff</option>
+                    </select>
+                </div>
+                <button type="submit" class="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-4 py-3.5 text-sm font-bold text-white shadow-lg shadow-emerald-700/20 transition hover:-translate-y-0.5 hover:shadow-xl">
+                    Continue to EcoCycle <i data-lucide="arrow-right" class="h-4 w-4"></i>
+                </button>
+            </form>
+            <div class="my-6 flex items-center gap-3"><span class="h-px flex-1 bg-slate-200"></span><span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Demo access</span><span class="h-px flex-1 bg-slate-200"></span></div>
+            <div class="grid grid-cols-2 gap-3">
+                <button type="button" onclick="fillDemo('staff@test.com','123','staff')" class="rounded-xl border border-emerald-100 bg-emerald-50/70 p-3 text-left transition hover:border-emerald-300 hover:bg-emerald-50">
+                    <span class="mb-1 flex items-center gap-1.5 text-xs font-extrabold text-emerald-800"><i data-lucide="shield-check" class="h-3.5 w-3.5"></i> Staff</span>
+                    <span class="text-[10px] text-slate-600">staff@test.com / 123</span>
+                </button>
+                <button type="button" onclick="fillDemo('priya@test.com','123','citizen')" class="rounded-xl border border-teal-100 bg-teal-50/70 p-3 text-left transition hover:border-teal-300 hover:bg-teal-50">
+                    <span class="mb-1 flex items-center gap-1.5 text-xs font-extrabold text-teal-800"><i data-lucide="heart-handshake" class="h-3.5 w-3.5"></i> Citizen</span>
+                    <span class="text-[10px] text-slate-600">priya@test.com / 123</span>
+                </button>
+            </div>
+            <p class="mt-6 text-center text-sm text-slate-500">New to EcoCycle? <a href="{{ url_for('register') }}" class="font-bold text-emerald-700 hover:text-emerald-900">Create an account</a></p>
+        </section>
+        <p class="mt-6 text-center text-xs text-slate-500">Recycle responsibly. Recover valuable resources. 🌱</p>
+    </div>
+</main>
+<script>
+    function fillDemo(email, password, category) {
+        document.getElementById("email").value = email;
+        document.getElementById("password").value = password;
+        document.getElementById("category").value = category;
+    }
+</script>
+{% endblock %}
