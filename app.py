@@ -861,8 +861,9 @@ def upload_too_large(error):
     return error
 
 
+init_db()
 if __name__ == "__main__":
-    init_db()
+    
     print("EcoCycle E-Waste Management System: http://127.0.0.1:5000")
     print("Demo staff: staff@test.com / 123 (select Staff)")
     print("Demo citizen: priya@test.com / 123 (select Citizen)")
