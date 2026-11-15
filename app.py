@@ -3,9 +3,11 @@
 import datetime
 import math
 import os
+import re
 import sqlite3
 import uuid
 from functools import wraps
+from urllib.parse import urlencode
 
 from flask import (
     Flask,
@@ -25,6 +27,7 @@ SQL_FILE = os.path.join(BASE_DIR, "database.sql")
 UPLOAD_FOLDER = os.path.join(BASE_DIR, "static", "uploads")
 ALLOWED_IMAGE_EXTENSIONS = {"jpg", "jpeg", "png", "webp"}
 REWARD_PER_KG = 2.5
+UPI_ID_PATTERN = re.compile(r"[A-Za-z0-9._-]{2,256}@[A-Za-z0-9.-]{2,64}")
 
 app = Flask(__name__)
 app.config.update(
@@ -393,10 +396,6 @@ def login():
     if request.method == "POST":
         email = request.form.get("email", "").strip().lower()
         password = request.form.get("password", "")
-        category = request.form.get("category", "").strip().lower()
-        if category not in ("staff", "citizen"):
-            flash("Select Staff or Citizen as your account category.", "danger")
-            return render_template("login.html")
 
         conn = get_db_connection()
         try:
@@ -413,7 +412,7 @@ def login():
                 if not valid_password:
                     valid_password = user["password"] == password
 
-            if user and valid_password and user["category"] == category:
+            if user and valid_password:
                 if not user["password"].startswith(("scrypt:", "pbkdf2:")):
                     conn.execute(
                         "UPDATE users SET password = ? WHERE id = ?",
@@ -427,7 +426,7 @@ def login():
                 session["category"] = user["category"]
                 flash(f"Welcome back, {user['name']}!", "success")
                 return redirect(_login_destination(user["category"]))
-            flash("Email, password, or category is incorrect.", "danger")
+            flash("Email or password is incorrect.", "danger")
         finally:
             conn.close()
 
@@ -441,7 +440,6 @@ def register():
         email = request.form.get("email", "").strip().lower()
         password = request.form.get("password", "")
         confirm_password = request.form.get("confirm_password", "")
-        category = request.form.get("category", "").strip().lower()
 
         if not name or not email or not password:
             flash("Please complete all required fields.", "danger")
@@ -449,10 +447,6 @@ def register():
         if password != confirm_password:
             flash("Password and confirmation do not match.", "danger")
             return render_template("registration.html")
-        if category not in ("staff", "citizen"):
-            flash("Select Staff or Citizen as your category.", "danger")
-            return render_template("registration.html")
-
         conn = get_db_connection()
         try:
             conn.execute(
@@ -460,7 +454,7 @@ def register():
                 INSERT INTO users (name, email, password, category)
                 VALUES (?, ?, ?, ?)
                 """,
-                (name, email, generate_password_hash(password), category),
+                (name, email, generate_password_hash(password), "citizen"),
             )
             conn.commit()
         except sqlite3.IntegrityError:
@@ -518,6 +512,34 @@ def citizen_dashboard():
         rewards=round(rewards, 2),
         items=items,
         active_module="dashboard",
+    )
+
+
+@app.route("/citizen/payment", methods=["GET", "POST"])
+@citizen_required
+def citizen_payment():
+    upi_id = ""
+    upi_uri = None
+    if request.method == "POST":
+        upi_id = request.form.get("upi_id", "").strip()
+        if not UPI_ID_PATTERN.fullmatch(upi_id):
+            flash("Enter a valid UPI ID, such as name@bank.", "danger")
+        else:
+            upi_uri = "upi://pay?" + urlencode(
+                {
+                    "pa": upi_id,
+                    "pn": "EcoCycle",
+                    "cu": "INR",
+                    "tn": "EcoCycle payment",
+                }
+            )
+
+    return render_template(
+        "citizen_dashboard.html",
+        citizen_name=session.get("user_name", "Citizen"),
+        active_module="payment",
+        upi_id=upi_id,
+        upi_uri=upi_uri,
     )
 
 
@@ -761,19 +783,20 @@ def staff_collections():
     )
 
 
-@app.route("/staff/transactions")
+@app.route("/staff/history")
 @staff_required
-def staff_transactions():
+def staff_history():
     conn = get_db_connection()
     try:
-        transactions = conn.execute(
+        history = conn.execute(
             """
-            SELECT t.id, t.weight, t.reward_amount, t.date,
+            SELECT t.id, t.weight, t.reward_amount, t.date AS completed_at,
                    u.name AS citizen_name, u.email AS citizen_email,
-                   e.item_type
+                   e.item_type, e.status, c.pickup_date, c.pickup_address
             FROM transactions AS t
             JOIN users AS u ON u.id = t.user_id
             JOIN ewaste_items AS e ON e.id = t.item_id
+            LEFT JOIN collections AS c ON c.item_id = t.item_id AND c.user_id = t.user_id
             ORDER BY t.id DESC
             """
         ).fetchall()
@@ -782,8 +805,43 @@ def staff_transactions():
     return render_template(
         "staff_dashboard.html",
         staff_name=session.get("user_name", "Staff"),
-        active_module="transactions",
-        transactions=transactions,
+        active_module="history",
+        history=history,
+    )
+
+
+@app.route("/staff/transactions")
+@staff_required
+def staff_transactions():
+    return redirect(url_for("staff_history"))
+
+
+@app.route("/citizen/history")
+@citizen_required
+def citizen_history():
+    user_id = session["user_id"]
+    conn = get_db_connection()
+    try:
+        history = conn.execute(
+            """
+            SELECT e.id, e.item_type, e.weight, e.description, e.image_path, e.status,
+                   e.created_at, c.pickup_date, c.pickup_address,
+                   COALESCE(t.reward_amount, 0) AS reward_amount
+            FROM ewaste_items AS e
+            LEFT JOIN collections AS c ON c.item_id = e.id AND c.user_id = e.user_id
+            LEFT JOIN transactions AS t ON t.item_id = e.id AND t.user_id = e.user_id
+            WHERE e.user_id = ?
+            ORDER BY e.id DESC
+            """,
+            (user_id,),
+        ).fetchall()
+    finally:
+        conn.close()
+    return render_template(
+        "citizen_dashboard.html",
+        citizen_name=session.get("user_name", "Citizen"),
+        active_module="history",
+        history=history,
     )
 
 

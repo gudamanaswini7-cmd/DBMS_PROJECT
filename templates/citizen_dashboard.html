@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}{{ 'New Waste' if active_module == 'new-waste' else 'Citizen Dashboard' }} | EcoCycle{% endblock %}
+{% block title %}{{ {'new-waste': 'New Waste', 'payment': 'UPI Payment', 'history': 'History'}.get(active_module, 'Citizen Dashboard') }} | EcoCycle{% endblock %}
 {% block content %}
 <div class="min-h-screen bg-gradient-to-br from-emerald-50 via-green-50 to-emerald-100 lg:flex">
     <aside class="flex w-full flex-col border-b border-emerald-900/10 bg-slate-950 text-white lg:fixed lg:inset-y-0 lg:w-64 lg:border-b-0 lg:border-r lg:border-white/10">
@@ -15,6 +15,12 @@
             <a href="{{ url_for('citizen_new_waste') }}" class="flex shrink-0 items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition {% if active_module == 'new-waste' %}bg-emerald-500 text-white shadow-lg shadow-emerald-900/20{% else %}text-slate-300 hover:bg-white/10 hover:text-white{% endif %}">
                 <i data-lucide="plus-square" class="h-4 w-4"></i> New Waste
             </a>
+            <a href="{{ url_for('citizen_history') }}" class="flex shrink-0 items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition {% if active_module == 'history' %}bg-emerald-500 text-white shadow-lg shadow-emerald-900/20{% else %}text-slate-300 hover:bg-white/10 hover:text-white{% endif %}">
+                <i data-lucide="history" class="h-4 w-4"></i> History
+            </a>
+            <a href="{{ url_for('citizen_payment') }}" class="flex shrink-0 items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition {% if active_module == 'payment' %}bg-emerald-500 text-white shadow-lg shadow-emerald-900/20{% else %}text-slate-300 hover:bg-white/10 hover:text-white{% endif %}">
+                <i data-lucide="wallet-cards" class="h-4 w-4"></i> UPI Payment
+            </a>
         </nav>
         <div class="mt-auto hidden border-t border-white/10 p-4 lg:block">
             <div class="mb-4 flex items-center gap-3 rounded-xl bg-white/5 p-3">
@@ -27,7 +33,7 @@
 
     <div class="min-w-0 flex-1 lg:ml-64">
         <header class="sticky top-0 z-20 flex items-center justify-between border-b border-white/70 bg-white/80 px-5 py-4 backdrop-blur-xl sm:px-8">
-            <div><p class="text-xs font-bold uppercase tracking-widest text-emerald-700">Citizen workspace</p><h1 class="brand-font mt-0.5 text-lg font-extrabold text-slate-900">{% if active_module == 'new-waste' %}Register new waste{% else %}Dashboard overview{% endif %}</h1></div>
+            <div><p class="text-xs font-bold uppercase tracking-widest text-emerald-700">Citizen workspace</p><h1 class="brand-font mt-0.5 text-lg font-extrabold text-slate-900">{{ {'new-waste': 'Register new waste', 'payment': 'UPI Payment', 'history': 'History'}.get(active_module, 'Dashboard overview') }}</h1></div>
             <div class="flex items-center gap-3">
                 <span class="hidden text-sm font-semibold text-slate-600 sm:block">{{ citizen_name }}</span>
                 <a href="{{ url_for('logout') }}" class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-600 transition hover:border-rose-200 hover:text-rose-700 lg:hidden"><i data-lucide="log-out" class="inline h-4 w-4"></i></a>
@@ -84,7 +90,16 @@
                     </table>
                 </div>
             </section>
-            {% else %}
+            {% elif active_module == 'history' %}
+            <section class="overflow-hidden rounded-2xl border border-white bg-white/95 shadow-lg shadow-emerald-950/5">
+                <div class="border-b border-slate-100 px-5 py-5 sm:px-6"><h2 class="brand-font text-lg font-extrabold text-slate-900">My History</h2><p class="mt-1 text-sm text-slate-500">A complete log of your submitted e-waste items, pickups, and eco rewards.</p></div>
+                <div class="overflow-x-auto"><table class="w-full min-w-[760px] text-left text-sm"><thead class="bg-emerald-50/70 text-[10px] font-extrabold uppercase tracking-widest text-slate-500"><tr><th class="px-5 py-3">Item</th><th class="px-5 py-3">Weight</th><th class="px-5 py-3">Submitted</th><th class="px-5 py-3">Pickup Date</th><th class="px-5 py-3">Reward</th><th class="px-5 py-3">Status</th></tr></thead><tbody class="divide-y divide-slate-100">
+                    {% for item in history %}
+                    <tr class="transition hover:bg-emerald-50/30"><td class="px-5 py-4"><div class="flex items-center gap-3">{% if item.image_path %}<img src="{{ url_for('static', filename=item.image_path) }}" alt="" class="h-10 w-10 rounded-xl object-cover">{% else %}<span class="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700"><i data-lucide="cpu" class="h-5 w-5"></i></span>{% endif %}<span><span class="block font-bold text-slate-900">{{ item.item_type }}</span><span class="line-clamp-1 block max-w-xs text-xs text-slate-500">{{ item.description or 'No description' }}</span></span></div></td><td class="whitespace-nowrap px-5 py-4 font-bold text-slate-700">{{ "%.2f"|format(item.weight) }} kg</td><td class="whitespace-nowrap px-5 py-4 text-slate-500">{{ item.created_at[:10] }}</td><td class="whitespace-nowrap px-5 py-4 text-slate-500">{{ item.pickup_date or 'Pending' }}</td><td class="px-5 py-4 font-extrabold text-emerald-700">${{ "%.2f"|format(item.reward_amount) }}</td><td class="px-5 py-4"><span class="rounded-full px-2.5 py-1 text-[10px] font-extrabold {% if item.status == 'completed' %}bg-emerald-100 text-emerald-800{% else %}bg-amber-100 text-amber-800{% endif %}">{{ item.status|capitalize }}</span></td></tr>
+                    {% else %}<tr><td colspan="6" class="px-5 py-12 text-center"><span class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-700"><i data-lucide="history" class="h-6 w-6"></i></span><p class="mt-3 font-bold text-slate-700">No history yet</p><p class="mt-1 text-sm text-slate-500">Your completed recycling activity will appear here.</p></td></tr>{% endfor %}
+                </tbody></table></div>
+            </section>
+            {% elif active_module == 'new-waste' %}
             <section class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
                 <article class="rounded-2xl border border-white bg-white/95 p-6 shadow-lg shadow-emerald-950/5 sm:p-8">
                     <div class="mb-7 flex items-start gap-4"><span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700"><i data-lucide="recycle" class="h-6 w-6"></i></span><div><h2 class="brand-font text-xl font-extrabold text-slate-900">Tell us what you’re recycling</h2><p class="mt-1 text-sm text-slate-500">Add the item details and where our collection team can pick it up.</p></div></div>
@@ -105,6 +120,37 @@
                 <aside class="space-y-5">
                     <article class="rounded-2xl bg-gradient-to-br from-emerald-700 to-teal-700 p-6 text-white shadow-lg shadow-emerald-900/10"><span class="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-white/15"><i data-lucide="sparkles" class="h-5 w-5"></i></span><h3 class="brand-font text-lg font-extrabold">Good for the planet</h3><p class="mt-2 text-sm leading-6 text-emerald-50/90">Your device may contain materials that can be recovered and used again. Every responsible handoff matters.</p></article>
                     <article class="rounded-2xl border border-white bg-white/90 p-5 shadow-lg shadow-emerald-950/5"><h3 class="font-extrabold text-slate-900">What happens next?</h3><div class="mt-4 space-y-4"><div class="flex gap-3"><span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-xs font-extrabold text-emerald-800">1</span><p class="text-xs leading-5 text-slate-600">Staff reviews the pickup request and details.</p></div><div class="flex gap-3"><span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-xs font-extrabold text-emerald-800">2</span><p class="text-xs leading-5 text-slate-600">The collection is arranged for your selected date.</p></div><div class="flex gap-3"><span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-xs font-extrabold text-emerald-800">3</span><p class="text-xs leading-5 text-slate-600">Rewards are credited after the collection is completed.</p></div></div></article>
+                </aside>
+            </section>
+            {% else %}
+            <section class="mx-auto grid max-w-4xl grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_300px]">
+                <article class="rounded-2xl border border-white bg-white/95 p-6 shadow-lg shadow-emerald-950/5 sm:p-8">
+                    <div class="mb-7 flex items-start gap-4">
+                        <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700"><i data-lucide="landmark" class="h-6 w-6"></i></span>
+                        <div><h2 class="brand-font text-xl font-extrabold text-slate-900">Pay with UPI</h2><p class="mt-1 text-sm text-slate-500">Enter the recipient’s UPI ID to open your UPI app.</p></div>
+                    </div>
+                    <form method="post" action="{{ url_for('citizen_payment') }}" class="space-y-5">
+                        <div>
+                            <label for="upi-id" class="mb-1.5 block text-xs font-extrabold uppercase tracking-wide text-slate-600">Recipient UPI ID</label>
+                            <input id="upi-id" name="upi_id" type="text" inputmode="email" autocomplete="off" maxlength="320" required value="{{ upi_id }}" placeholder="name@bank" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/10">
+                            <p class="mt-2 text-xs text-slate-500">The amount is not prefilled; enter it in your UPI app.</p>
+                        </div>
+                        <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-5 py-3 text-sm font-extrabold text-white shadow-lg shadow-emerald-700/20 transition hover:-translate-y-0.5"><i data-lucide="arrow-up-right" class="h-4 w-4"></i> Continue to UPI</button>
+                    </form>
+                    {% if upi_uri %}
+                    <div class="mt-6 rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
+                        <p class="text-sm font-extrabold text-emerald-900">Ready to continue</p>
+                        <p class="mt-1 text-sm text-emerald-800">Confirm the recipient <strong>{{ upi_id }}</strong> and the amount in your UPI app before authorizing.</p>
+                        <a href="{{ upi_uri }}" class="mt-4 inline-flex items-center gap-2 rounded-xl bg-emerald-700 px-4 py-2.5 text-sm font-extrabold text-white transition hover:bg-emerald-800"><i data-lucide="smartphone" class="h-4 w-4"></i> Open UPI app</a>
+                    </div>
+                    {% endif %}
+                </article>
+                <aside class="space-y-5">
+                    <article class="rounded-2xl border border-amber-200 bg-amber-50 p-5">
+                        <span class="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-amber-100 text-amber-800"><i data-lucide="shield-alert" class="h-5 w-5"></i></span>
+                        <h3 class="font-extrabold text-amber-950">Check before paying</h3>
+                        <p class="mt-2 text-sm leading-6 text-amber-900">Only pay a recipient you trust. EcoCycle opens your UPI app but does not process, record, or verify payments.</p>
+                    </article>
                 </aside>
             </section>
             {% endif %}
